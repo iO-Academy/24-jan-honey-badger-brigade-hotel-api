@@ -13,7 +13,4 @@ class Booking extends Model
     {
     }
 
-    public static function create(array $array)
-    {
-    }
 }
