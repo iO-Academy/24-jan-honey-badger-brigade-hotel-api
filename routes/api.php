@@ -11,7 +11,7 @@ Route::controller(RoomController::class)->group(function() {
 
 Route::controller(TypeController::class)->group(function() {
     Route::get('/types', 'all');
-    Route::get('/rooms/{id}', 'find');
+    Route::get('/types/{id}', 'find');
 });
 
 //Route::controller(TypeController::class)->group(function() {
