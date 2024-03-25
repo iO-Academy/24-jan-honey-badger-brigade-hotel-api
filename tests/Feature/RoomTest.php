@@ -73,8 +73,6 @@ class RoomTest extends TestCase
 
     public function test_findRoom_notFound(): void
     {
-        Room::factory()->create();
-
         $response = $this->getJson('/api/rooms/100');
 
         $response->assertNotFound()
