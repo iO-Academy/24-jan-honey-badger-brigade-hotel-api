@@ -14,6 +14,7 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         for ($i = 0; $i < 10; $i++) {
+
             Room::factory()
                 ->recycle(Type::factory()->create())
                 ->count(3)->create();
