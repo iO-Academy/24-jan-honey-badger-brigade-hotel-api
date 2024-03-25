@@ -19,7 +19,7 @@ class RoomController extends Controller
     public function all()
     {
         return response()->json($this->responseService->getFormat(
-           'Rooms Retrieved',
+           'Rooms successfully retrieved',
             Room::with(['type:id,name'])->get()
         ));
     }
