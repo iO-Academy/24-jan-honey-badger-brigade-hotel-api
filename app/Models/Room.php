@@ -11,7 +11,7 @@ class Room extends Model
     use HasFactory;
 
     public $hidden = ['created_at', 'updated_at', 'type_id'];
-    public function types(): BelongsTo
+    public function type(): BelongsTo
     {
         return $this->belongsTo(Type::class);
     }
