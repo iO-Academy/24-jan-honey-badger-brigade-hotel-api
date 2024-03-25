@@ -11,6 +11,11 @@ class Room extends Model
     use HasFactory;
 
     public $hidden = ['created_at', 'updated_at'];
+
+    public static function checkCapacity(mixed $room_id)
+    {
+    }
+
     public function types(): BelongsTo
     {
         return $this->belongsTo(Type::class);
