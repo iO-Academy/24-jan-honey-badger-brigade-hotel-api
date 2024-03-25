@@ -4,10 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-class RequestLogger
+class BookingValidator
 {
     /**
      * Handle an incoming request.
@@ -16,7 +15,15 @@ class RequestLogger
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Log::info('We received a '.$request->method().' request to '.$request->url());
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'room_id' => 'required|exists:rooms,id',
+                'customer' => 'required|string',
+                'guests' => 'required|integer',
+                'start' => 'required|date|before_or_equal:end',
+                'end' => 'required|date|after_or_equal:start',
+            ]);
+        }
 
         return $next($request);
     }

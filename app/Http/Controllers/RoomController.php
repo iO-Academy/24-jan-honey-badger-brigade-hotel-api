@@ -1,51 +1,42 @@
 <?php
 
 
-// app/Http/Controllers/BookingController.php
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
 use App\Models\Room;
-use Illuminate\Http\Request;
+use App\Services\JsonResponseService;
 
-class BookingController extends Controller
+class RoomController extends Controller
 {
-    public function create(Request $request)
+    private JsonResponseService $responseService;
+
+    public function __construct(JsonResponseService $responseService)
     {
-        $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'customer' => 'required|string',
-            'guests' => 'required|integer',
-            'start' => 'required|date|before_or_equal:end',
-            'end' => 'required|date|after_or_equal:start',
-        ]);
+        $this->responseService = $responseService;
+    }
+    public function all()
+    {
+        return response()->json($this->responseService->getFormat(
+            'Rooms successfully retrieved',
+            Room::with(['type:id,name'])->get()->makeHidden(['rate', 'description'])
+        ));
+    }
 
-        $isRoomAvailable = Booking::isAvailable('room_id', $request->room_id)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('start', [$request->start, $request->end])
-                    ->orWhereBetween('end', [$request->start, $request->end]);
-            })
-            ->doesntExist();
+    public function find(int $id)
+    {
+        $room = Room::find($id);
 
-        if (!$isRoomAvailable) {
-            return response()->json(['message' => 'The room is already booked for the given dates.'], 400);
+        if (! $room) {
+            return response()->json($this->responseService->getFormat(
+                'Room with id '.$id.' not found'
+            ), 404);
         }
 
-        $room = Room::checkCapacity($request->room_id);
-        if ($request->guests > $room->max_capacity) {
-            return response()->json(['message' => 'The number of guests exceeds the room\'s capacity.'], 400);
-        }
-
-        $booking = Booking::create([
-            'room_id' => $request->room_id,
-            'customer' => $request->customer,
-            'guests' => $request->guests,
-            'start' => $request->start,
-            'end' => $request->end,
-        ]);
-
-        return response()->json(['message' => 'Booking created successfully.'], 201);
+        return response()->json($this->responseService->getFormat(
+            'Room successfully retrieved',
+            Room::with(['type:id,name'])->find($id)
+        ));
     }
 }
 

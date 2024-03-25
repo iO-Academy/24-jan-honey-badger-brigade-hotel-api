@@ -9,15 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Room extends Model
 {
     use HasFactory;
-
-    public $hidden = ['created_at', 'updated_at'];
-
-    public static function checkCapacity(mixed $room_id)
-    {
-    }
-
-    public function types(): BelongsTo
+    public $hidden = ['created_at', 'updated_at', 'type_id'];
+    public function type(): BelongsTo
     {
         return $this->belongsTo(Type::class);
+    }
+    public static function checkCapacity(mixed $room_id)
+    {
     }
 }
