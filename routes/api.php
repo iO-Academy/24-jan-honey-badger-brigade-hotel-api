@@ -9,14 +9,7 @@ Route::controller(RoomController::class)->group(function () {
     Route::get('/rooms/{id}', 'find');
 });
 
-
-//Route::controller(TypeController::class)->group(function() {
-//    Route::get('/types', 'all');
-//    Route::get('/rooms/{id}', 'find');
-//});
-
 Route::controller(BookingController::class)->group(function() {
 //    Route::get('/bookings', 'all');
     Route::post('/bookings/{id}', 'create');
 });
-
