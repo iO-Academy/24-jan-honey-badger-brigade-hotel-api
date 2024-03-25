@@ -14,6 +14,6 @@ class Type extends Model
 
     public function rooms(): HasMany
     {
-        return $this->hasMany(Rooms::class)
+        return $this->hasMany(Room::class);
     }
 }
