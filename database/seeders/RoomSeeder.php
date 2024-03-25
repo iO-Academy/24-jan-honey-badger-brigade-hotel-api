@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Room;
+use App\Models\Type;
 use Illuminate\Database\Seeder;
 
 class RoomSeeder extends Seeder
@@ -13,9 +14,10 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         for ($i = 0; $i < 10; $i++) {
-            Room::factory()->create([
-                'type_id' => rand(1, 9),
-            ]);
+
+            Room::factory()
+                ->recycle(Type::factory()->create())
+                ->count(3)->create();
         }
     }
 }
