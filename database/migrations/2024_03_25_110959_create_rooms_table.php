@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100 );
+            $table->string('name', 100);
             $table->integer('min_capacity')->default(1);
             $table->integer('max_capacity');
             $table->string('image');

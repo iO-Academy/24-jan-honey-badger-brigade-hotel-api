@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -15,31 +14,31 @@ class TypeSeeder extends Seeder
     {
         $toInsert = [
             [
-                'name' => 'Sea View'
+                'name' => 'Sea View',
             ],
             [
-                'name' => 'High Roller Suite'
+                'name' => 'High Roller Suite',
             ],
             [
-                'name' => 'Family Room'
+                'name' => 'Family Room',
             ],
             [
-                'name' => 'Basement'
+                'name' => 'Basement',
             ],
             [
-                'name' => 'Premier Room'
+                'name' => 'Premier Room',
             ],
             [
-                'name' => 'Basic Room'
+                'name' => 'Basic Room',
             ],
             [
-                'name' => 'Accessible Room'
+                'name' => 'Accessible Room',
             ],
             [
-                'name' => 'Pet-Friendly Room'
+                'name' => 'Pet-Friendly Room',
             ],
             [
-                'name' => 'Space Pirate Themed Room'
+                'name' => 'Space Pirate Themed Room',
             ],
         ];
 

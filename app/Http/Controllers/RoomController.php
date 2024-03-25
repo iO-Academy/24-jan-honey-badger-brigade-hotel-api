@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Services\JsonResponseService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
     private JsonResponseService $responseService;
 
-    public function __construct (JsonResponseService $responseService)
+    public function __construct(JsonResponseService $responseService)
     {
         $this->responseService = $responseService;
     }
@@ -19,7 +17,7 @@ class RoomController extends Controller
     public function all()
     {
         return response()->json($this->responseService->getFormat(
-           'Rooms successfully retrieved',
+            'Rooms successfully retrieved',
             Room::with(['type:id,name'])->get()->makeHidden(['rate', 'description'])
         ));
     }
@@ -30,9 +28,10 @@ class RoomController extends Controller
 
         if (! $room) {
             return response()->json($this->responseService->getFormat(
-                'Room with id ' . $id . ' not found'
+                'Room with id '.$id.' not found'
             ), 404);
         }
+
         return response()->json($this->responseService->getFormat(
             'Room successfully retrieved',
             Room::with(['type:id,name'])->find($id)
