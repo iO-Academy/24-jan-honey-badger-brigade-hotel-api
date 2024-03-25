@@ -49,7 +49,7 @@ class RoomTest extends TestCase
             ->assertJson(function (AssertableJson $json) {
                 $json->hasAll(['message', 'data'])
                     ->whereType('message', 'string')
-                    ->has('data', 1, function (AssertableJson $json) {
+                    ->has('data', function (AssertableJson $json) {
                         $json->hasAll(['id', 'name', 'rate', 'image', 'min_capacity', 'max_capacity', 'description', 'type'])
                             ->whereAllType([
                                 'id' => 'integer',
@@ -60,7 +60,7 @@ class RoomTest extends TestCase
                                 'max_capacity' => 'integer',
                                 'description' => 'string',
                             ])
-                            ->has('type', 1, function (AssertableJson $json) {
+                            ->has('type', function (AssertableJson $json) {
                                 $json->hasAll(['id', 'name'])
                                     ->whereAllType([
                                         'id' => 'integer',
@@ -75,7 +75,7 @@ class RoomTest extends TestCase
     {
         Room::factory()->create();
 
-        $response = $this->getJson('/api/rooms/1');
+        $response = $this->getJson('/api/rooms/100');
 
         $response->assertNotFound()
             ->assertJson(function (AssertableJson $json) {
