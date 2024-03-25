@@ -1,8 +1,21 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\TypeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::controller(RoomController::class)->group(function() {
+    Route::get('/rooms', 'all');
+    Route::get('/rooms/{id}', 'find');
+});
+
+Route::controller(TypeController::class)->group(function() {
+    Route::get('/types', 'all');
+    Route::get('/rooms/{id}', 'find');
+});
+
+//Route::controller(TypeController::class)->group(function() {
+//    Route::get('/bookings', 'all');
+//    Route::get('/bookings/{id}', 'find');
+//    Route::get('/bookings/report', 'find');
+//});
