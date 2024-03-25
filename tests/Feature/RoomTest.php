@@ -18,6 +18,7 @@ class RoomTest extends TestCase
         Room::factory()->create();
 
         $response = $this->getJson('/api/rooms');
+        $response->assertStatus(200)
           ->assertJson(function (AssertableJson $json) {
                 $json->hasAll(['message', 'data'])
                     ->whereType('message', 'string')
