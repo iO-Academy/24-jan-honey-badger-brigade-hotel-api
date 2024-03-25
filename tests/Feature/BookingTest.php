@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Room;
+use App\Models\Booking;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -43,7 +44,7 @@ class BookingTest extends TestCase
             'end' => '2024-08-24'
         ]);
     }
-    public function test_bookings_badDates()
+    public function test_bookings_illogicalDates()
     {
         Room::factory()->create();
         $response = $this->postJson('/api/bookings', [
@@ -61,14 +62,19 @@ class BookingTest extends TestCase
     }
     public function test_bookings_alreadyBooked()
     {
-        $room = Room::factory()->(Booking::factory())->create();
+        Room::factory()->create();
+        Booking::factory()->create([
+            'room_id' => 1,
+            'start' => '2024-08-14',
+            'end' => '2024-08-24'
+        ]);
 
         $response = $this->postJson('/api/bookings', [
             'room_id' => 1,
             'customer' => 'Mrs Test',
             'guests' => 1,
-            'start' => '2024-08-20',
-            'end' => '2024-08-14'
+            'start' => '2024-08-21',
+            'end' => '2024-08-25'
         ]);
         $response->assertStatus(400)
             ->assertJson(function (AssertableJson $json) {
@@ -77,6 +83,24 @@ class BookingTest extends TestCase
             });
     }
 
+    public function test_bookings_tooManyGuests()
+    {
+        Room::factory()->create([
+            'min_capacity' => 1,
+            'max_capacity' => 2
+        ]);
 
-
+        $response = $this->postJson('/api/bookings', [
+            'room_id' => 1,
+            'customer' => 'Mrs Test',
+            'guests' => 3,
+            'start' => '2024-08-21',
+            'end' => '2024-08-25'
+        ]);
+        $response->assertStatus(400)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message'])
+                    ->whereType('message', 'string');
+            });
+    }
 }
