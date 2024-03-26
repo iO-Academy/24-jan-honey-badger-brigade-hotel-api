@@ -247,4 +247,3 @@ class BookingTest extends TestCase
             });
     }
 }
-

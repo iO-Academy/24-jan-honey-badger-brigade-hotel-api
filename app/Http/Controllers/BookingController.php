@@ -21,7 +21,6 @@ class BookingController extends Controller
         $this->availabilityService = $availabilityService;
     }
 
-
     public function create(Request $request): JsonResponse
     {
         $start = strtotime($request->start);
