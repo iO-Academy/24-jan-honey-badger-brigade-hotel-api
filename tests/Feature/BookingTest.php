@@ -23,7 +23,10 @@ class BookingTest extends TestCase
     }
     public function test_bookings_createSuccess(): void
     {
-        Room::factory()->create();
+        Room::factory()->create([
+            'min_capacity' => 1,
+            'max_capacity' => 2,
+        ]);
         $response = $this->postJson('/api/bookings', [
             'room_id' => 1,
             'customer' => 'Mrs Test',
@@ -46,7 +49,10 @@ class BookingTest extends TestCase
     }
     public function test_bookings_illogicalDates()
     {
-        Room::factory()->create();
+        Room::factory()->create([
+            'min_capacity' => 1,
+            'max_capacity' => 2,
+        ]);
         $response = $this->postJson('/api/bookings', [
             'room_id' => 1,
             'customer' => 'Mrs Test',
@@ -65,6 +71,8 @@ class BookingTest extends TestCase
         Room::factory()->create();
         Booking::factory()->create([
             'room_id' => 1,
+            'customer' => 'Mrs Existing Booking',
+            'guests' => 1,
             'start' => '2024-08-14',
             'end' => '2024-08-24'
         ]);
