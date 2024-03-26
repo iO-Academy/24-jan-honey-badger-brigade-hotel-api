@@ -18,7 +18,7 @@ class BookingValidator
         if ($request->isMethod('post')) {
             $request->validate([
                 'room_id' => 'required|exists:rooms,id',
-                'customer' => 'required|string',
+                'customer' => 'required|string|max:100',
                 'guests' => 'required|integer',
                 'start' => 'required|date',
                 'end' => 'required|date',
