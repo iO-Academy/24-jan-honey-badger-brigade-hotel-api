@@ -7,7 +7,6 @@ use App\Models\Room;
 use App\Services\JsonResponseService;
 use Illuminate\Http\Request;
 
-
 class BookingController extends Controller
 {
     private JsonResponseService $responseService;
@@ -43,7 +42,7 @@ class BookingController extends Controller
         $room = Room::find($request->room_id);
         if ($newBooking->guests < $room->min_capacity || $newBooking->guests > $room->max_capacity) {
             return response()->json($this->responseService->getFormat(
-                'The ' . $room->name . ' can only accommodate between ' . $room->min_capacity . ' and ' . $room->max_capacity . ' guests.'
+                'The '.$room->name.' can only accommodate between '.$room->min_capacity.' and '.$room->max_capacity.' guests.'
             ), 400);
         }
 
@@ -51,14 +50,10 @@ class BookingController extends Controller
             return response()->json($this->responseService->getFormat(
                 'Failed to create booking'
             ), 500);
-        };
+        }
+
         return response()->json($this->responseService->getFormat(
             'Booking successfully created.'
         ), 201);
     }
 }
-
-
-
-
-

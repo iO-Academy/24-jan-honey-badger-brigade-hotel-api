@@ -18,7 +18,7 @@ class BookingFactory extends Factory
     public function definition(): array
     {
         $start = $this->faker->dateTimeBetween('+1 day', '+1 year');
-        $length = rand(1, 21) . ' days';
+        $length = rand(1, 21).' days';
         $end = date_add($start, date_interval_create_from_date_string($length));
 
         return [
@@ -26,7 +26,7 @@ class BookingFactory extends Factory
             'customer' => $this->faker->name(),
             'guests' => rand(1, 6),
             'start' => $start,
-            'end' => $end
-            ];
+            'end' => $end,
+        ];
     }
 }

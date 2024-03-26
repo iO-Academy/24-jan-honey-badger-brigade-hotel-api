@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace App\Http\Controllers;
 
 use App\Models\Room;
@@ -15,6 +13,7 @@ class RoomController extends Controller
     {
         $this->responseService = $responseService;
     }
+
     public function all()
     {
         return response()->json($this->responseService->getFormat(
@@ -39,4 +38,3 @@ class RoomController extends Controller
         ));
     }
 }
-
