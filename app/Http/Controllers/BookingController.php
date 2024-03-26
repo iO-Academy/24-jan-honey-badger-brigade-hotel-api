@@ -56,4 +56,12 @@ class BookingController extends Controller
             'Booking successfully created.'
         ), 201);
     }
+
+    public function filterByRoom (Request $request)
+    {
+            return response()->json($this->responseService->getFormat(
+                'Bookings successfully retrieved',
+                Booking::where('room_id', $request->room_id)->with('room:id,name')->get()->makeVisible('created_at')->makeHidden(['room_id', 'guests'])
+            ));
+    }
 }
