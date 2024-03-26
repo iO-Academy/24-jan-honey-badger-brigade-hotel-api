@@ -22,7 +22,6 @@ class BookingFactory extends Factory
         $stay = rand(1, 21);
         $open = Carbon::parse($start);
         $end = $open->addDays($stay);
-
         return [
             'room_id' => Room::factory(),
             'customer' => $this->faker->name(),

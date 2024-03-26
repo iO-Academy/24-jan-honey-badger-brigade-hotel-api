@@ -10,7 +10,9 @@ class Booking extends Model
 {
     use HasFactory;
 
+
     public $hidden = ['updated_at'];
+
 
     public function room(): BelongsTo
     {
