@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('room_id', 10);
+            $table->string('customer');
+            $table->integer('guests');
+            $table->date('start');
+            $table->date('end');
+
         });
     }
 
