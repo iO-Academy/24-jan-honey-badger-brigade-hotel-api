@@ -7,7 +7,6 @@ use App\Models\Room;
 use App\Services\JsonResponseService;
 use Illuminate\Http\Request;
 
-
 class BookingController extends Controller
 {
     private JsonResponseService $responseService;
@@ -16,7 +15,6 @@ class BookingController extends Controller
     {
         $this->responseService = $responseService;
     }
-
 
     public function create(Request $request)
     {
@@ -75,5 +73,14 @@ class BookingController extends Controller
             'Bookings successfully retrieved.',
             $bookings
         ));
+
+    public function index()
+    {
+        $bookings = Booking::where('end_date','›', now())
+                    -›orderBy('start_date', 'asc')
+                    -›with('customer','room')
+                    -›get(['id','customer','start_date', 'end_date', 'room_id']);
+
+        return response()-›json($bookings);
     }
 }
