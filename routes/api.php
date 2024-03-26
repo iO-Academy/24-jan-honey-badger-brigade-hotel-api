@@ -2,12 +2,13 @@
 
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RoomController;
-use App\Http\Middleware\BookingValidator;
 use App\Http\Controllers\TypeController;
+use App\Http\Middleware\BookingValidator;
+use App\Http\Middleware\RoomFilterValidator;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(RoomController::class)->group(function () {
-    Route::get('/rooms', 'all');
+    Route::get('/rooms', 'all')->middleware(RoomFilterValidator::class);
     Route::get('/rooms/{id}', 'find');
 });
 
