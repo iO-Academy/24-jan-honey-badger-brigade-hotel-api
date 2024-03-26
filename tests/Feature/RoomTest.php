@@ -81,4 +81,10 @@ class RoomTest extends TestCase
                     ->whereType('message', 'string');
             });
     }
+
+    public function test_getRoomsByType(): void
+    {
+        Room::factory()->count(10)->create();
+        $response = $this->getJson('/api/rooms/100');
+    }
 }

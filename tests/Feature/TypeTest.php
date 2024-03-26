@@ -31,4 +31,5 @@ class TypeTest extends TestCase
             });
 
     }
+
 }
