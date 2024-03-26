@@ -23,8 +23,8 @@ class RoomFactory extends Factory
             'max_capacity' => rand(3, 6),
             'image' => 'https://picsum.photos/400/400',
             'type_id' => Type::factory(),
-            'rate'=> rand(1,5),
-            'description' => $this->faker->sentence(5)
+            'rate' => rand(1, 5),
+            'description' => $this->faker->sentence(5),
         ];
     }
 }
