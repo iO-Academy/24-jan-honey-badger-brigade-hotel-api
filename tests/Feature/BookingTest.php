@@ -188,11 +188,12 @@ class BookingTest extends TestCase
             });
     }
 
-    public function test_get_bookings_by_room()
-    {
-        Room::factory()->create();
-        Booking::factory()->create();
-        $response = $this->postJson('/api/bookings?room_id=1');
+    public function test_getBookingsByRoom()
+    {   Room::factory()->create([]);
+        Booking::factory()->create([
+            'room_id' => 1
+        ]);
+        $response = $this->getJson('/api/bookings?room_id=1');
         $response->assertStatus(200)
             -> assertJson(function (AssertableJson $json){
                 $json->hasAll(['message', 'data'])
@@ -202,9 +203,9 @@ class BookingTest extends TestCase
                             ->whereAllType([
                                 'id' => 'integer',
                                 'customer' => 'string',
-                                'start' => 'date',
-                                'end' => 'date',
-                                'created_at' => 'timestamp'])
+                                'start' => 'string',
+                                'end' => 'string',
+                                'created_at' => 'string'])
                             ->has('room', function (AssertableJson $json) {
                                 $json->hasAll(['id', 'name'])
                                     ->whereAllType([
