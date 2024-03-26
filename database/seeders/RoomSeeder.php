@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Type;
 use Illuminate\Database\Seeder;
@@ -14,10 +15,9 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         for ($i = 0; $i < 10; $i++) {
-
-            Room::factory()
-                ->recycle(Type::factory()->create())
-                ->count(3)->create();
+            Room::factory()->has(Booking::factory()->count(4))->create([
+                'type_id' => rand(1, 9),
+            ]);
         }
     }
 }

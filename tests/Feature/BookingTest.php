@@ -105,13 +105,43 @@ class BookingTest extends TestCase
     }
     public function test_bookings_seeAllFuture()
     {
-        Room::factory()->has(Booking::factory()->count(4))->count(5)->create();
+        Booking::factory()->create(['end' => '2024-12-24']);
+        Booking::factory()->create(['end' => '2024-08-10']);
+        Booking::factory()->create(['end' => '2023-12-24']);
         $response = $this->getJson('/api/bookings');
         $response->assertStatus(200)
             ->assertJson(function (AssertableJson $json) {
                 $json->hasAll(['message', 'data'])
                     ->whereType('message', 'string')
-                    ->has('data', 20, function (AssertableJson $json) {
+                    ->has('data', 2, function (AssertableJson $json) {
+                        $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'customer' => 'string',
+                                'start' => 'string',
+                                'end' => 'string',
+                                'created_at' => 'string',
+                            ])
+                            ->has('room', function (AssertableJson $json) {
+                                $json->hasAll(['id', 'name'])
+                                    ->whereAllType([
+                                        'id' => 'integer',
+                                        'name' => 'string'
+                                    ]);
+                            });
+                    });
+            });
+    }
+    public function test_bookings_noFinishedBookings()
+    {
+        Booking::factory()->create(['end' => '2024-12-24']);
+        Booking::factory()->create(['end' => '2023-12-24']);
+        $response = $this->getJson('/api/bookings');
+        $response->assertStatus(200)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 1, function (AssertableJson $json) {
                         $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
                             ->whereAllType([
                                 'id' => 'integer',

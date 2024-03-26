@@ -10,6 +10,6 @@ Route::controller(RoomController::class)->group(function () {
 });
 
 Route::controller(BookingController::class)->group(function() {
-//    Route::get('/bookings', 'all');
+    Route::get('/bookings', 'all');
     Route::post('/bookings/{id}', 'create');
 });
