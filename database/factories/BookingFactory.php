@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Booking;
+use App\Models\Room;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -15,11 +15,18 @@ class BookingFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    protected $model = Booking::class;
     public function definition(): array
     {
+        $start = $this->faker->dateTimeBetween('+1 day', '+1 year');
+        $length = rand(1, 21) . ' days';
+        $end = date_add($start, date_interval_create_from_date_string($length));
+
         return [
-            //
-        ];
+            'room_id' => Room::factory(),
+            'customer' => $this->faker->name(),
+            'guests' => rand(1, 6),
+            'start' => $start,
+            'end' => $end
+            ];
     }
 }
