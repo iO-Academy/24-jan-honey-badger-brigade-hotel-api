@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Room extends Model
 {
     use HasFactory;
+
     public $hidden = ['created_at', 'updated_at', 'type_id'];
+
     public function type(): BelongsTo
     {
         return $this->belongsTo(Type::class);
@@ -19,6 +21,5 @@ class Room extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
-
     }
 }

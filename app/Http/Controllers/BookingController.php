@@ -4,60 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Room;
+use App\Services\CheckAvailabilityService;
 use App\Services\JsonResponseService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
     private JsonResponseService $responseService;
 
-    public function __construct(JsonResponseService $responseService)
+    private CheckAvailabilityService $availabilityService;
+
+    public function __construct(JsonResponseService $responseService, CheckAvailabilityService $availabilityService)
     {
         $this->responseService = $responseService;
+        $this->availabilityService = $availabilityService;
     }
 
-    public function create(Request $request)
+
+    public function create(Request $request): JsonResponse
     {
-        $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'customer' => 'required|string',
-            'guests' => 'required|integer',
-            'start' => 'required|date|before_or_equal:end',
-            'end' => 'required|date|after_or_equal:start',
-        ]);
-
-        $isRoomAvailable = Booking::isAvailable('room_id', $request->room_id)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('start', [$request->start, $request->end])
-                    ->orWhereBetween('end', [$request->start, $request->end]);
-            })
-            ->doesntExist();
-
-        if (!$isRoomAvailable) {
-            return response()->json(['message' => 'The room is already booked for the given dates.'], 400);
+        $start = strtotime($request->start);
+        $end = strtotime($request->end);
+        if ($start > $end) {
+            return response()->json($this->responseService->getFormat(
+                'Start date must be before the end date.'
+            ), 400);
         }
-        $room = Room::checkCapacity($request->room_id);
-        $roomMinCap = Room::find($request->room_id);
-
-        if ($request->guests > $room->max_capacity) {
-            return response()->json(['message' => 'The ' . ' can only accommodate between ' . ' and ' . ' guests.'], 400);
+        $result = $this->availabilityService->checkBooking($request);
+        if (! $result) {
+            return response()->json($this->responseService->getFormat(
+                'Room unavailable for the chosen dates.'
+            ), 400);
         }
+        $room = Room::find($request->room_id);
+        if ($request->guests < $room->min_capacity || $request->guests > $room->max_capacity) {
+            return response()->json($this->responseService->getFormat(
+                'The '.$room->name.' can only accommodate between '.$room->min_capacity.' and '.$room->max_capacity.' guests.'
+            ), 400);
+        }
+        $newBooking = new Booking();
+        $newBooking->room_id = $request->room_id;
+        $newBooking->customer = $request->customer;
+        $newBooking->guests = $request->guests;
+        $newBooking->start = $request->start;
+        $newBooking->end = $request->end;
 
-        $booking = new Booking();
-        $booking->room_id = $request->room_id;
-        $booking->customer = $request->customer;
-        $booking->guests = $request->guests;
-        $booking->start = $request->start;
-        $booking->end = $request->end;
-
-        if (! $booking->save()) {
+        if (! $newBooking->save()) {
             return response()->json($this->responseService->getFormat(
                 'Failed to create booking'
             ), 500);
-        };
+        }
 
         return response()->json($this->responseService->getFormat(
-             'Booking successfully created.'
+            'Booking successfully created.'
         ), 201);
     }
 
@@ -73,14 +73,5 @@ class BookingController extends Controller
             'Bookings successfully retrieved.',
             $bookings
         ));
-
-    public function index()
-    {
-        $bookings = Booking::where('end_date','›', now())
-                    -›orderBy('start_date', 'asc')
-                    -›with('customer','room')
-                    -›get(['id','customer','start_date', 'end_date', 'room_id']);
-
-        return response()-›json($bookings);
     }
 }
