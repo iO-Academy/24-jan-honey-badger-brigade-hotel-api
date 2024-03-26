@@ -3,11 +3,14 @@
 namespace Tests\Feature;
 
 use App\Models\Type;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class TypeTest extends TestCase
 {
+    use DatabaseMigrations;
+
     public function test_getAllTypes(): void
     {
         Type::factory()->create();
@@ -21,8 +24,8 @@ class TypeTest extends TestCase
                     ->has('data', 1, function (AssertableJson $json) {
                         $json->hasAll(['id', 'name'])
                             ->whereAllType([
-                                'id'=>'integer',
-                                'name'=>'string'
+                                'id' => 'integer',
+                                'name' => 'string',
                             ]);
                     });
             });
