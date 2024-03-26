@@ -71,6 +71,7 @@ class BookingTest extends TestCase
             });
 
     }
+
     public function test_bookings_dateOverlapEnd()
     {
         Room::factory()->create([
@@ -95,6 +96,7 @@ class BookingTest extends TestCase
             });
 
     }
+
     public function test_bookings_dateOverlapBoth()
     {
         Room::factory()->create([
@@ -119,6 +121,7 @@ class BookingTest extends TestCase
             });
 
     }
+
     public function test_bookings_illogicalDates()
     {
         Room::factory()->create([
