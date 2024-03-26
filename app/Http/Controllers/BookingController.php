@@ -63,11 +63,15 @@ class BookingController extends Controller
 
     public function all()
     {
-        $bookings = Booking::where('end_date','›', now())
-            -›orderBy('start_date', 'asc')
-            -›with('customer','room')
-            -›get(['id','customer','start_date', 'end_date', 'room_id']);
+        $bookings = Booking::where('end', '>', now())
+            ->orderBy('start', 'asc')
+            ->with('room:id,name')
+            ->get()
+            ->makeHidden(['room_id', 'updated_at', 'guests']);
 
-        return response()-›json($bookings);
+        return response()->json($this->responseService->getFormat(
+            'Bookings successfully retrieved.',
+            $bookings
+        ));
     }
 }
