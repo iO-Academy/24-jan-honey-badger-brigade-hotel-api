@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Booking;
 use App\Models\Room;
 use App\Services\CheckAvailabilityService;
@@ -12,7 +11,6 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
-
     private JsonResponseService $responseService;
 
     private CheckAvailabilityService $availabilityService;
@@ -37,7 +35,7 @@ class BookingController extends Controller
             return response()->json($this->responseService->getFormat(
                 'Room unavailable for the chosen dates.'
             ), 400);
-            }
+        }
         $room = Room::find($request->room_id);
         if ($request->guests < $room->min_capacity || $request->guests > $room->max_capacity) {
             return response()->json($this->responseService->getFormat(
@@ -74,15 +72,5 @@ class BookingController extends Controller
             'Bookings successfully retrieved.',
             $bookings
         ));
-    }
-
-    public function index()
-    {
-        $bookings = Booking::where('end_date','›', now())
-                    -›orderBy('start_date', 'asc')
-                    -›with('customer','room')
-                    -›get(['id','customer','start_date', 'end_date', 'room_id']);
-
-        return response()-›json($bookings);
     }
 }

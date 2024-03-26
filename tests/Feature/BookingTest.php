@@ -47,7 +47,7 @@ class BookingTest extends TestCase
         ]);
     }
 
-    public function test_bookings_dateOverlapStart()
+    public function test_bookings_dateOverlapStart(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -72,7 +72,7 @@ class BookingTest extends TestCase
 
     }
 
-    public function test_bookings_dateOverlapEnd()
+    public function test_bookings_dateOverlapEnd(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -97,7 +97,7 @@ class BookingTest extends TestCase
 
     }
 
-    public function test_bookings_dateOverlapBoth()
+    public function test_bookings_dateOverlapBoth(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -122,7 +122,7 @@ class BookingTest extends TestCase
 
     }
 
-    public function test_bookings_illogicalDates()
+    public function test_bookings_illogicalDates(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -142,7 +142,7 @@ class BookingTest extends TestCase
             });
     }
 
-    public function test_bookings_alreadyBooked()
+    public function test_bookings_alreadyBooked(): void
     {
         Room::factory()->create();
         Booking::factory()->create([
@@ -167,7 +167,7 @@ class BookingTest extends TestCase
             });
     }
 
-    public function test_bookings_tooManyGuests()
+    public function test_bookings_tooManyGuests(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -187,7 +187,8 @@ class BookingTest extends TestCase
                     ->whereType('message', 'string');
             });
     }
-    public function test_bookings_seeAllFuture()
+
+    public function test_bookings_seeAllFuture(): void
     {
         Booking::factory()->create(['end' => '2024-12-24']);
         Booking::factory()->create(['end' => '2024-08-10']);
@@ -210,13 +211,14 @@ class BookingTest extends TestCase
                                 $json->hasAll(['id', 'name'])
                                     ->whereAllType([
                                         'id' => 'integer',
-                                        'name' => 'string'
+                                        'name' => 'string',
                                     ]);
                             });
                     });
             });
     }
-    public function test_bookings_noFinishedBookings()
+
+    public function test_bookings_onlyFutureBookings(): void
     {
         Booking::factory()->create(['end' => '2024-12-24']);
         Booking::factory()->create(['end' => '2023-12-24']);
@@ -238,11 +240,10 @@ class BookingTest extends TestCase
                                 $json->hasAll(['id', 'name'])
                                     ->whereAllType([
                                         'id' => 'integer',
-                                        'name' => 'string'
+                                        'name' => 'string',
                                     ]);
                             });
                     });
             });
     }
 }
-

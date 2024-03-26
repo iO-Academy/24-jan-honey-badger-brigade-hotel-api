@@ -19,7 +19,7 @@ class BookingFactory extends Factory
     public function definition(): array
     {
         $start = $this->faker->dateTimeBetween('-1 year', '+1 year');
-        $stay = rand(1,21);
+        $stay = rand(1, 21);
         $open = Carbon::parse($start);
         $end = $open->addDays($stay);
 
