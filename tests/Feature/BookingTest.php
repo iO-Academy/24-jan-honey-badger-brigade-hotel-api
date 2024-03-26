@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Booking;
 use App\Models\Room;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
@@ -190,44 +191,15 @@ class BookingTest extends TestCase
 
     public function test_bookings_seeAllFuture(): void
     {
-        Booking::factory()->create(['end' => '2024-12-24']);
-        Booking::factory()->create(['end' => '2024-08-10']);
-        Booking::factory()->create(['end' => '2023-12-24']);
+        Booking::factory()->create(['end' => Carbon::yesterday()]);
+        Booking::factory()->create(['end' => Carbon::tomorrow()]);
+        Booking::factory()->create(['end' => Carbon::now()->addDays(30)]);
         $response = $this->getJson('/api/bookings');
         $response->assertStatus(200)
             ->assertJson(function (AssertableJson $json) {
                 $json->hasAll(['message', 'data'])
                     ->whereType('message', 'string')
                     ->has('data', 2, function (AssertableJson $json) {
-                        $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
-                            ->whereAllType([
-                                'id' => 'integer',
-                                'customer' => 'string',
-                                'start' => 'string',
-                                'end' => 'string',
-                                'created_at' => 'string',
-                            ])
-                            ->has('room', function (AssertableJson $json) {
-                                $json->hasAll(['id', 'name'])
-                                    ->whereAllType([
-                                        'id' => 'integer',
-                                        'name' => 'string',
-                                    ]);
-                            });
-                    });
-            });
-    }
-
-    public function test_bookings_onlyFutureBookings(): void
-    {
-        Booking::factory()->create(['end' => '2024-12-24']);
-        Booking::factory()->create(['end' => '2023-12-24']);
-        $response = $this->getJson('/api/bookings');
-        $response->assertStatus(200)
-            ->assertJson(function (AssertableJson $json) {
-                $json->hasAll(['message', 'data'])
-                    ->whereType('message', 'string')
-                    ->has('data', 1, function (AssertableJson $json) {
                         $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
                             ->whereAllType([
                                 'id' => 'integer',
