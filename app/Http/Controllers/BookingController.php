@@ -59,9 +59,10 @@ class BookingController extends Controller
 
     public function filterByRoom (Request $request)
     {
+
             return response()->json($this->responseService->getFormat(
                 'Bookings successfully retrieved',
-                Booking::where('room_id', $request->room_id)->with('room:id,name')->get()->makeVisible('created_at')->makeHidden(['room_id', 'guests'])
+                Booking::where('room_id', $request->room_id)->where('start', '>=', date('Y-m-d'))->with('room:id,name')->get()->makeVisible('created_at')->makeHidden(['room_id', 'guests'])
             ));
     }
 }
