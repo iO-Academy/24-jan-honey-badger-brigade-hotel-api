@@ -73,7 +73,7 @@ class BookingController extends Controller
             'Bookings successfully retrieved.',
             $bookings
         ));
-
+    }
     public function index()
     {
         $bookings = Booking::where('end_date','›', now())

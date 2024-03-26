@@ -160,5 +160,32 @@ class BookingTest extends TestCase
                     });
             });
     }
+
+    public function test_report(): void
+    {   Booking::factory()
+            ->recycle(['room_id'=>1])
+            ->count(5)
+            ->create();
+        Booking::factory()
+            ->recycle(['room_id'=>2])
+            ->count(5)
+            ->create();
+
+        $response = $this->getJson('/api/bookings/report');
+        $response->assertOk()
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 2, function (AssertableJson $json) {
+                        $json->hasAll(['id', 'name', 'booking_count', 'average_booking_duration'])
+                            ->whereAllType([
+                                'id'=>'integer',
+                                'name'=>'string',
+                                'booking_count'=>'integer',
+                                'average_booking_duration'=>'integer'
+                            ]);
+                    });
+            });
+    }
 }
 
