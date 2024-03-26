@@ -23,10 +23,17 @@ class BookingController extends Controller
 
     public function create(Request $request): JsonResponse
     {
-        $result = $this->availabilityService->checkBooking($request);
-        if (is_string($result)) {
+        $start = strtotime($request->start);
+        $end = strtotime($request->end);
+        if ($start > $end) {
             return response()->json($this->responseService->getFormat(
-                $result
+                'Start date must be before the end date.'
+            ), 400);
+        }
+        $result = $this->availabilityService->checkBooking($request);
+        if (! $result) {
+            return response()->json($this->responseService->getFormat(
+                'Room unavailable for the chosen dates.'
             ), 400);
         }
         $room = Room::find($request->room_id);
