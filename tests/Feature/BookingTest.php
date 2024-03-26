@@ -25,7 +25,6 @@ class BookingTest extends TestCase
     {
         Room::factory()->create([
             'min_capacity' => 1,
-            'max_capacity' => 2,
         ]);
         $response = $this->postJson('/api/bookings', [
             'room_id' => 1,
@@ -46,6 +45,81 @@ class BookingTest extends TestCase
             'start' => '2024-08-20',
             'end' => '2024-08-24',
         ]);
+    }
+
+    public function test_bookings_dateOverlapStart()
+    {
+        Room::factory()->create([
+            'min_capacity' => 1,
+        ]);
+        Booking::factory()->create([
+            'room_id' => 1,
+            'start' => '2024-08-14',
+            'end' => '2024-08-24',
+        ]);
+        $response = $this->postJson('/api/bookings', [
+            'room_id' => 1,
+            'customer' => 'Mrs Test',
+            'guests' => 1,
+            'start' => '2024-08-10',
+            'end' => '2024-08-15',
+        ]);
+        $response->assertStatus(400)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message'])
+                    ->whereType('message', 'string');
+            });
+
+    }
+
+    public function test_bookings_dateOverlapEnd()
+    {
+        Room::factory()->create([
+            'min_capacity' => 1,
+        ]);
+        Booking::factory()->create([
+            'room_id' => 1,
+            'start' => '2024-08-14',
+            'end' => '2024-08-24',
+        ]);
+        $response = $this->postJson('/api/bookings', [
+            'room_id' => 1,
+            'customer' => 'Mrs Test',
+            'guests' => 1,
+            'start' => '2024-08-20',
+            'end' => '2024-08-26',
+        ]);
+        $response->assertStatus(400)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message'])
+                    ->whereType('message', 'string');
+            });
+
+    }
+
+    public function test_bookings_dateOverlapBoth()
+    {
+        Room::factory()->create([
+            'min_capacity' => 1,
+        ]);
+        Booking::factory()->create([
+            'room_id' => 1,
+            'start' => '2024-08-14',
+            'end' => '2024-08-24',
+        ]);
+        $response = $this->postJson('/api/bookings', [
+            'room_id' => 1,
+            'customer' => 'Mrs Test',
+            'guests' => 1,
+            'start' => '2024-08-10',
+            'end' => '2024-08-28',
+        ]);
+        $response->assertStatus(400)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message'])
+                    ->whereType('message', 'string');
+            });
+
     }
 
     public function test_bookings_illogicalDates()
