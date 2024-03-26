@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('guests');
             $table->date('start');
             $table->date('end');
-
+            $table->timestamps();
         });
     }
 

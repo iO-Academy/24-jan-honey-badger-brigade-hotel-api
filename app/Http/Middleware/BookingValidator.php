@@ -20,8 +20,8 @@ class BookingValidator
                 'room_id' => 'required|exists:rooms,id',
                 'customer' => 'required|string',
                 'guests' => 'required|integer',
-                'start' => 'required|date|before_or_equal:end',
-                'end' => 'required|date|after_or_equal:start',
+                'start' => 'required|date',
+                'end' => 'required|date',
             ]);
         }
 

@@ -10,15 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Booking extends Model
 {
     use HasFactory;
-
-    public static function isAvailable(string $string, mixed $room_id)
-    {
-    }
+    public $hidden = ['updated_at', 'created_at'];
 
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
     }
-
-
 }
