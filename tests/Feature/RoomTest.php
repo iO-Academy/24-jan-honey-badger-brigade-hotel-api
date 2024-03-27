@@ -124,4 +124,83 @@ class RoomTest extends TestCase
         $response = $this->getJson('/api/rooms?type=1');
         $response->assertInvalid(['type']);
     }
+
+    public function test_getRoomsByGuests()
+    {
+        Room::factory()
+            ->create([
+                'min_capacity' => 1,
+                'max_capacity' => 2,
+            ]);
+
+        $response = $this->getJson('/api/rooms?guests=2');
+        $response->assertStatus(200)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 1, function (AssertableJson $json) {
+                        $json->hasAll(['id', 'name', 'image', 'min_capacity', 'max_capacity', 'type'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'name' => 'string',
+                                'image' => 'string',
+                                'min_capacity' => 'integer',
+                                'max_capacity' => 'integer',
+                            ])
+                            ->has('type', function (AssertableJson $json) {
+                                $json->hasAll(['id', 'name'])
+                                    ->whereAllType([
+                                        'id' => 'integer',
+                                        'name' => 'string',
+                                    ]);
+                            });
+                    });
+            });
+    }
+
+    public function test_getRoomsByGuests_zeroGuests()
+    {
+        $response = $this->getJson('/api/rooms?guests=0');
+        $response->assertInvalid('guests');
+    }
+
+    public function test_getRoomsByTypeAndGuests()
+    {
+        Room::factory()
+            ->recycle(Type::factory()->create())
+            ->count(2)
+            ->create([
+                'min_capacity' => 1,
+                'max_capacity' => 2,
+            ]);
+        Room::factory()
+            ->create([
+                'min_capacity' => 5,
+                'max_capacity' => 6,
+            ]);
+
+        $response = $this->getJson('/api/rooms?type=1&guests=2');
+        $response->assertStatus(200)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 2, function (AssertableJson $json) {
+                        $json->hasAll(['id', 'name', 'image', 'min_capacity', 'max_capacity', 'type'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'name' => 'string',
+                                'image' => 'string',
+                                'min_capacity' => 'integer',
+                                'max_capacity' => 'integer',
+                            ])
+                            ->has('type', function (AssertableJson $json) {
+                                $json->hasAll(['id', 'name'])
+                                    ->whereAllType([
+                                        'id' => 'integer',
+                                        'name' => 'string',
+                                    ]);
+                            });
+                    });
+            });
+    }
 }
