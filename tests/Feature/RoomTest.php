@@ -132,6 +132,11 @@ class RoomTest extends TestCase
                 'min_capacity' => 1,
                 'max_capacity' => 2,
             ]);
+        Room::factory()
+            ->create([
+                'min_capacity' => 5,
+                'max_capacity' => 6,
+            ]);
 
         $response = $this->getJson('/api/rooms?guests=2');
         $response->assertStatus(200)
