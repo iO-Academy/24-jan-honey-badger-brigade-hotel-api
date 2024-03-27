@@ -17,23 +17,24 @@ class RoomController extends Controller
 
     public function all(Request $request)
     {
-        if ($request->type) {
-            $type = $request->type;
+        $hidden = ['rate', 'description', 'type_id'];
+        $query = Room::with(['type:id,name']);
 
-            return response()->json($this->responseService->getFormat(
-                'Rooms successfully retrieved',
-                Room::with(['type:id,name'])
-                    ->where('type_id', $type)
-                    ->get()
-                    ->makeHidden(['rate', 'description', 'type_id'])
-            ));
+        $type = $request->type;
+        $guests = $request->guests;
+
+        if ($type) {
+            $query->where('type_id', $type);
+        }
+
+        if ($guests) {
+            $query->where('min_capacity', '<=', $guests)
+                ->where('max_capacity', '>=', $guests);
         }
 
         return response()->json($this->responseService->getFormat(
             'Rooms successfully retrieved',
-            Room::with(['type:id,name'])
-                ->get()
-                ->makeHidden(['rate', 'description', 'type_id'])
+            $query->get()->makeHidden($hidden)
         ));
     }
 
