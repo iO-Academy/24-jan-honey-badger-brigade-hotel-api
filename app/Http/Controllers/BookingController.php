@@ -61,19 +61,31 @@ class BookingController extends Controller
         ), 201);
     }
 
-    public function all()
+    public function all(Request $request)
     {
-        $bookings = Booking::where('end', '>', now())
-            ->orderBy('start', 'asc')
+        $hidden = ['room_id', 'guests'];
+
+        $bookings = Booking::orderBy('start', 'asc')
             ->with('room:id,name')
+            ->where('end', '>', now())
             ->get()
-            ->makeHidden(['room_id', 'updated_at', 'guests']);
+            ->makeHidden($hidden);
+
+        $filterBookings = $request->room_id;
+
+        if ($filterBookings) {
+            return response()->json($this->responseService->getFormat(
+                'Bookings successfully retrieved',
+                $bookings->where('room_id', $request->room_id))
+            );
+        }
 
         return response()->json($this->responseService->getFormat(
             'Bookings successfully retrieved.',
             $bookings
         ));
     }
+
 
     public function getReport()
     {
@@ -94,5 +106,20 @@ class BookingController extends Controller
             'report generated',
             $report
         ));
+
+    public function delete(int $id)
+    {
+        $booking = Booking::find($id);
+        if (! $booking) {
+            return response()->json($this->responseService->getFormat(
+                'Unable to cancel booking, booking '.$id.' not found'
+            ), 404);
+        }
+
+        $booking->delete();
+
+        return response()->json($this->responseService->getFormat(
+            'Booking '.$booking->id.' cancelled'
+        ), 200);
     }
 }

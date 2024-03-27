@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Room;
+use App\Models\Type;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
@@ -80,5 +81,47 @@ class RoomTest extends TestCase
                 $json->has('message')
                     ->whereType('message', 'string');
             });
+    }
+
+    public function test_getRoomsByType(): void
+    {
+        Room::factory()
+            ->recycle(Type::factory()->create())
+            ->count(4)
+            ->create();
+        Room::factory()
+            ->recycle(Type::factory()->create())
+            ->count(2)
+            ->create();
+
+        $response = $this->getJson('/api/rooms?type=1');
+        $response->assertStatus(200)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 4, function (AssertableJson $json) {
+                        $json->hasAll(['id', 'name', 'image', 'min_capacity', 'max_capacity', 'type'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'name' => 'string',
+                                'image' => 'string',
+                                'min_capacity' => 'integer',
+                                'max_capacity' => 'integer',
+                            ])
+                            ->has('type', function (AssertableJson $json) {
+                                $json->hasAll(['id', 'name'])
+                                    ->whereAllType([
+                                        'id' => 'integer',
+                                        'name' => 'string',
+                                    ]);
+                            });
+                    });
+            });
+    }
+
+    public function test_getRoomsByType_invalidType()
+    {
+        $response = $this->getJson('/api/rooms?type=1');
+        $response->assertInvalid(['type']);
     }
 }

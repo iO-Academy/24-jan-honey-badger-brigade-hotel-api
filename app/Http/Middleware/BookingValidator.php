@@ -23,6 +23,10 @@ class BookingValidator
                 'start' => 'required|date',
                 'end' => 'required|date',
             ]);
+        } elseif ($request->isMethod('get')) {
+            $request->validate([
+                'room_id' => 'exists:rooms,id',
+            ]);
         }
 
         return $next($request);
