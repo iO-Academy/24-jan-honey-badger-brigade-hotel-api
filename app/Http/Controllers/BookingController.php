@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Type;
 use App\Services\CheckAvailabilityService;
 use App\Services\JsonResponseService;
 use Illuminate\Http\JsonResponse;
@@ -31,7 +32,7 @@ class BookingController extends Controller
             ), 400);
         }
         $result = $this->availabilityService->checkBooking($request);
-        if (!$result) {
+        if (! $result) {
             return response()->json($this->responseService->getFormat(
                 'Room unavailable for the chosen dates.'
             ), 400);
@@ -39,7 +40,7 @@ class BookingController extends Controller
         $room = Room::find($request->room_id);
         if ($request->guests < $room->min_capacity || $request->guests > $room->max_capacity) {
             return response()->json($this->responseService->getFormat(
-                'The ' . $room->name . ' can only accommodate between ' . $room->min_capacity . ' and ' . $room->max_capacity . ' guests.'
+                'The '.$room->name.' can only accommodate between '.$room->min_capacity.' and '.$room->max_capacity.' guests.'
             ), 400);
         }
         $newBooking = new Booking();
@@ -49,7 +50,7 @@ class BookingController extends Controller
         $newBooking->start = $request->start;
         $newBooking->end = $request->end;
 
-        if (!$newBooking->save()) {
+        if (! $newBooking->save()) {
             return response()->json($this->responseService->getFormat(
                 'Failed to create booking'
             ), 500);
@@ -71,6 +72,27 @@ class BookingController extends Controller
         return response()->json($this->responseService->getFormat(
             'Bookings successfully retrieved.',
             $bookings
+        ));
+    }
+
+    public function getReport()
+    {
+        $report = Type::select('types.id', 'types.name')
+            ->withCount('booking')
+            ->withAvg(['booking' => function ($query) {
+                $query->selectRaw('ROUND(DATEDIFF(end, start)) as average_booking_duration')
+                    ->groupBy('type_id');
+            }], 'id')
+            ->get();
+
+        $report->each(function ($item) {
+            $item->average_booking_duration = $item->booking_avg_id;
+            unset($item->booking_avg_id);
+        });
+
+        return response()->json($this->responseService->getFormat(
+            'report generated',
+            $report
         ));
     }
 }
