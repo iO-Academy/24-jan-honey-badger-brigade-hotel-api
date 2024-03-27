@@ -60,13 +60,24 @@ class BookingController extends Controller
         ), 201);
     }
 
-    public function all()
+    public function all(Request $request)
     {
-        $bookings = Booking::where('end', '>', now())
-            ->orderBy('start', 'asc')
+        $hidden = ['room_id', 'guests'];
+
+        $bookings = Booking::orderBy('start', 'asc')
             ->with('room:id,name')
+            ->where('end', '>', now())
             ->get()
-            ->makeHidden(['room_id', 'updated_at', 'guests']);
+            ->makeHidden($hidden);
+
+        $filterBookings = $request->room_id;
+
+        if ($filterBookings) {
+            return response()->json($this->responseService->getFormat(
+                'Bookings successfully retrieved',
+                $bookings->where('room_id', $request->room_id))
+            );
+        }
 
         return response()->json($this->responseService->getFormat(
             'Bookings successfully retrieved.',
