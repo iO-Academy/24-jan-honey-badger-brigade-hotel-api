@@ -17,6 +17,7 @@ class RoomFilterValidator
     {
         $request->validate([
             'type' => 'exists:types,id',
+            'guests' => 'integer|gt:0',
         ]);
 
         return $next($request);
