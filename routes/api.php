@@ -15,12 +15,11 @@ Route::controller(RoomController::class)->group(function () {
 Route::controller(TypeController::class)->group(function () {
     Route::get('/types', 'all');
 });
+
 Route::controller(BookingController::class)->group(function () {
-    Route::post('/bookings', 'create')->middleware(BookingValidator::class);
     Route::get('/bookings', 'all')->middleware(BookingValidator::class);
+    Route::post('/bookings', 'create')->middleware(BookingValidator::class);
+    Route::get('/bookings/report', 'getReport');
     Route::delete('/bookings/{id}', 'delete');
 });
 
-Route::controller(TypeController::class)->group(function () {
-    Route::get('/types', 'all');
-});

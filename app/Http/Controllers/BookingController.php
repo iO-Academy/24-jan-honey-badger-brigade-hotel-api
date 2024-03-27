@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Type;
 use App\Services\CheckAvailabilityService;
 use App\Services\JsonResponseService;
 use Illuminate\Http\JsonResponse;
@@ -84,6 +85,27 @@ class BookingController extends Controller
             $bookings
         ));
     }
+
+
+    public function getReport()
+    {
+        $report = Type::select('types.id', 'types.name')
+            ->withCount('booking')
+            ->withAvg(['booking' => function ($query) {
+                $query->selectRaw('ROUND(DATEDIFF(end, start)) as average_booking_duration')
+                    ->groupBy('type_id');
+            }], 'id')
+            ->get();
+
+        $report->each(function ($item) {
+            $item->average_booking_duration = $item->booking_avg_id;
+            unset($item->booking_avg_id);
+        });
+
+        return response()->json($this->responseService->getFormat(
+            'report generated',
+            $report
+        ));
 
     public function delete(int $id)
     {

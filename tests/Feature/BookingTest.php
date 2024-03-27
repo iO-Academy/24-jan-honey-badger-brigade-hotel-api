@@ -221,16 +221,41 @@ class BookingTest extends TestCase
             });
     }
 
+
+    public function test_report(): void
+    {
+        Booking::factory()
+            ->recycle(Room::factory()->create())
+            ->count(5)
+            ->create();
+
+        $response = $this->getJson('/api/bookings/report');
+        $response->assertOk()
+          ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 1, function (AssertableJson $json) {
+                       $json->hasAll(['id', 'name', 'booking_count', 'average_booking_duration'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'name' => 'string',
+                                'booking_count' => 'integer',
+                                'average_booking_duration' => 'integer',
+                            ]);
+                    });
+            });
+    }
+          
     public function test_getBookingsByRoom_success()
     {
         Booking::factory()->create(['end' => Carbon::tomorrow()]);
         $response = $this->getJson('/api/bookings?room_id=1');
         $response->assertStatus(200)
-            ->assertJson(function (AssertableJson $json) {
+          ->assertJson(function (AssertableJson $json) {
                 $json->hasAll(['message', 'data'])
                     ->whereType('message', 'string')
                     ->has('data', 1, function (AssertableJson $json) {
-                        $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
+                      $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
                             ->whereAllType([
                                 'id' => 'integer',
                                 'customer' => 'string',
@@ -247,6 +272,7 @@ class BookingTest extends TestCase
                     });
             });
     }
+          
 
     public function test_getBookingsByRoom_notFound()
     {
