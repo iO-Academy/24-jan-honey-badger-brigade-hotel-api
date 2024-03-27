@@ -81,4 +81,32 @@ class RoomTest extends TestCase
                     ->whereType('message', 'string');
             });
     }
+
+    public function test_getRoomsByAvailability()
+    {
+        Room::factory()->create();
+        $response = $this->getJson('/api/rooms?start=2025-03-27&end=2025-12-25&guests=3&type=2');
+        $response->assertStatus(200)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 1, function (AssertableJson $json) {
+                        $json->hasAll(['id', 'name', 'image', 'min_capacity', 'max_capacity', 'type'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'name' => 'string',
+                                'image' => 'string',
+                                'min_capacity' => 'integer',
+                                'max_capacity' => 'integer',
+                                ])
+                            ->has('type', function (AssertableJson $json) {
+                                $json->hasAll(['id', 'name'])
+                                    ->whereAllType([
+                                        'id' => 'integer',
+                                        'name' => 'string',
+                                    ]);
+                            });
+                    });
+            });
+    }
 }
