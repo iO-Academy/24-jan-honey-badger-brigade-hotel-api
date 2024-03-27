@@ -85,17 +85,19 @@ class BookingController extends Controller
         ));
     }
 
-    public function delete(int $id) {
+    public function delete(int $id)
+    {
         $booking = Booking::find($id);
         if (! $booking) {
             return response()->json($this->responseService->getFormat(
-                'Unable to cancel booking, booking ' . $id . ' not found'
+                'Unable to cancel booking, booking '.$id.' not found'
             ), 404);
         }
 
         $booking->delete();
+
         return response()->json($this->responseService->getFormat(
-            'Booking ' . $booking->id . ' cancelled'
+            'Booking '.$booking->id.' cancelled'
         ), 200);
     }
 }

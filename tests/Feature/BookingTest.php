@@ -255,7 +255,7 @@ class BookingTest extends TestCase
         $response->assertInvalid(['room_id']);
     }
 
-    public function test_deleteContract_success(): void
+    public function test_deleteBooking_success(): void
     {
         $booking = Booking::factory()->create();
         $response = $this->deleteJson('/api/bookings/1');
@@ -265,7 +265,17 @@ class BookingTest extends TestCase
                     ->whereType('message', 'string');
             });
         $this->assertDatabaseMissing('bookings', [
-            'id' => $booking->id
+            'id' => $booking->id,
         ]);
+    }
+
+    public function test_deleteBooking_notFound(): void
+    {
+        $response = $this->deleteJson('/api/bookings/1');
+        $response->assertStatus(404)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message'])
+                    ->whereType('message', 'string');
+            });
     }
 }
