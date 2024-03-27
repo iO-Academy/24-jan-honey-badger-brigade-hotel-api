@@ -13,6 +13,8 @@ class BookingTest extends TestCase
 {
     use DatabaseMigrations;
 
+    private $responseService;
+
     /**
      * A basic feature test example.
      */
@@ -245,5 +247,20 @@ class BookingTest extends TestCase
                             });
                     });
             });
+    }
+
+    public function test_getBookingsByRoom_notFound()
+    {
+        $response = $this->getJson('/api/bookings?room_id=99');
+
+        $this->assertNotNull($response, 'Response should not be null');
+
+        if (! $response)
+        {
+            $response->assertStatus(422);
+            return response()->json($this->responseService->getFormat(
+                'The selected room id is invalid'
+            ), 422);
+        }
     }
 }
