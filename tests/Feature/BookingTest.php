@@ -191,33 +191,6 @@ class BookingTest extends TestCase
             });
     }
 
-    public function test_getBookingsByRoom_success()
-    {
-        Booking::factory()->create();
-        $response = $this->getJson('/api/bookings?room_id=1');
-        $response->assertStatus(200)
-            ->assertJson(function (AssertableJson $json) {
-                $json->hasAll(['message', 'data'])
-                    ->whereType('message', 'string')
-                    ->has('data', 1, function (AssertableJson $json) {
-                        $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
-                            ->whereAllType([
-                                'id' => 'integer',
-                                'customer' => 'string',
-                                'start' => 'string',
-                                'end' => 'string',
-                                'created_at' => 'string'])
-                            ->has('room', function (AssertableJson $json) {
-                                $json->hasAll(['id', 'name'])
-                                    ->whereAllType([
-                                        'id' => 'integer',
-                                        'name' => 'string',
-                                    ]);
-                            });
-                    });
-            });
-    }
-
     public function test_bookings_seeAllFuture(): void
     {
         Booking::factory()->create(['end' => Carbon::yesterday()]);
@@ -248,11 +221,87 @@ class BookingTest extends TestCase
             });
     }
 
+
+    public function test_report(): void
+    {
+        Booking::factory()
+            ->recycle(Room::factory()->create())
+            ->count(5)
+            ->create();
+
+        $response = $this->getJson('/api/bookings/report');
+        $response->assertOk()
+          ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 1, function (AssertableJson $json) {
+                       $json->hasAll(['id', 'name', 'booking_count', 'average_booking_duration'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'name' => 'string',
+                                'booking_count' => 'integer',
+                                'average_booking_duration' => 'integer',
+                            ]);
+                    });
+            });
+    }
+          
+    public function test_getBookingsByRoom_success()
+    {
+        Booking::factory()->create(['end' => Carbon::tomorrow()]);
+        $response = $this->getJson('/api/bookings?room_id=1');
+        $response->assertStatus(200)
+          ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 1, function (AssertableJson $json) {
+                      $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'customer' => 'string',
+                                'start' => 'string',
+                                'end' => 'string',
+                                'created_at' => 'string'])
+                            ->has('room', function (AssertableJson $json) {
+                                $json->hasAll(['id', 'name'])
+                                    ->whereAllType([
+                                        'id' => 'integer',
+                                        'name' => 'string',
+                                    ]);
+                            });
+                    });
+            });
+    }
+          
+
     public function test_getBookingsByRoom_notFound()
     {
         $response = $this->getJson('/api/bookings?room_id=99');
-
         $response->assertStatus(422);
         $response->assertInvalid(['room_id']);
+    }
+
+    public function test_deleteBooking_success(): void
+    {
+        $booking = Booking::factory()->create();
+        $response = $this->deleteJson('/api/bookings/1');
+        $response->assertOk()
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message'])
+                    ->whereType('message', 'string');
+            });
+        $this->assertDatabaseMissing('bookings', [
+            'id' => $booking->id,
+        ]);
+    }
+
+    public function test_deleteBooking_notFound(): void
+    {
+        $response = $this->deleteJson('/api/bookings/1');
+        $response->assertStatus(404)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message'])
+                    ->whereType('message', 'string');
+            });
     }
 }

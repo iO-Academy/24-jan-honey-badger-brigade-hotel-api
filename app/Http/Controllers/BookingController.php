@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Type;
 use App\Services\CheckAvailabilityService;
 use App\Services\JsonResponseService;
 use Illuminate\Http\JsonResponse;
@@ -66,6 +67,7 @@ class BookingController extends Controller
 
         $bookings = Booking::orderBy('start', 'asc')
             ->with('room:id,name')
+            ->where('end', '>', now())
             ->get()
             ->makeHidden($hidden);
 
@@ -74,13 +76,50 @@ class BookingController extends Controller
         if ($filterBookings) {
             return response()->json($this->responseService->getFormat(
                 'Bookings successfully retrieved',
-                $bookings->where('room_id', $request->room_id)->where('start', '>=', date('Y-m-d'))
-            ));
+                $bookings->where('room_id', $request->room_id))
+            );
         }
 
         return response()->json($this->responseService->getFormat(
             'Bookings successfully retrieved.',
-            $bookings->where('end', '>', now())
+            $bookings
         ));
+    }
+
+
+    public function getReport()
+    {
+        $report = Type::select('types.id', 'types.name')
+            ->withCount('booking')
+            ->withAvg(['booking' => function ($query) {
+                $query->selectRaw('ROUND(DATEDIFF(end, start)) as average_booking_duration')
+                    ->groupBy('type_id');
+            }], 'id')
+            ->get();
+
+        $report->each(function ($item) {
+            $item->average_booking_duration = $item->booking_avg_id;
+            unset($item->booking_avg_id);
+        });
+
+        return response()->json($this->responseService->getFormat(
+            'report generated',
+            $report
+        ));
+
+    public function delete(int $id)
+    {
+        $booking = Booking::find($id);
+        if (! $booking) {
+            return response()->json($this->responseService->getFormat(
+                'Unable to cancel booking, booking '.$id.' not found'
+            ), 404);
+        }
+
+        $booking->delete();
+
+        return response()->json($this->responseService->getFormat(
+            'Booking '.$booking->id.' cancelled'
+        ), 200);
     }
 }
