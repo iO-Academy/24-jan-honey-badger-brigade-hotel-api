@@ -23,7 +23,7 @@ class RoomController extends Controller
             return response()->json($this->responseService->getFormat(
                 'Rooms successfully retrieved',
                 Room::with(['type:id,name'])
-                    ->where('type_id', 'LIKE', $type)
+                    ->where('type_id', $type)
                     ->get()
                     ->makeHidden(['rate', 'description', 'type_id'])
             ));
