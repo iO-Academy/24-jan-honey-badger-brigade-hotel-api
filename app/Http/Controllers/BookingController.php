@@ -65,8 +65,7 @@ class BookingController extends Controller
     {
         $hidden = ['room_id', 'guests'];
 
-        $bookings = Booking::where('end', '>', now())
-            ->orderBy('start', 'asc')
+        $bookings = Booking::orderBy('start', 'asc')
             ->with('room:id,name')
             ->get()
             ->makeHidden($hidden);
@@ -74,19 +73,15 @@ class BookingController extends Controller
         $filterBookings = $request->room_id;
 
         if ($filterBookings) {
-            return response()->json($this->responseService->getFormat(
+                return response()->json($this->responseService->getFormat(
                     'Bookings successfully retrieved',
-                    Booking::where('room_id', $request->room_id)
-                    ->where('start', '>=', date('Y-m-d'))
-                    ->with('room:id,name')
-                    ->get()
-                    ->makeHidden($hidden)
-            ));
+                    $bookings->where('room_id', $request->room_id)->where('start', '>=', date('Y-m-d'))
+                ));
             }
 
         return response()->json($this->responseService->getFormat(
             'Bookings successfully retrieved.',
-            $bookings
+            $bookings->where('end', '>', now())
         ));
     }
 }

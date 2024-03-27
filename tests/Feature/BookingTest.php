@@ -191,10 +191,7 @@ class BookingTest extends TestCase
 
     public function test_getBookingsByRoom_success()
     {
-        Room::factory()->create();
-        Booking::factory()->create([
-            'room_id' => 1
-        ]);
+        Booking::factory()->create();
         $response = $this->getJson('/api/bookings?room_id=1');
         $response->assertStatus(200)
             ->assertJson(function (AssertableJson $json) {
@@ -208,7 +205,7 @@ class BookingTest extends TestCase
                                 'start' => 'string',
                                 'end' => 'string',
                                 'created_at' => 'string'])
-                            ->has('room', 1, function (AssertableJson $json) {
+                            ->has('room', function (AssertableJson $json) {
                                 $json->hasAll(['id', 'name'])
                                     ->whereAllType([
                                         'id' => 'integer',
