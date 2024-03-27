@@ -208,7 +208,7 @@ class BookingTest extends TestCase
                                 'start' => 'string',
                                 'end' => 'string',
                                 'created_at' => 'string'])
-                            ->has('room', function (AssertableJson $json) {
+                            ->has('room', 1, function (AssertableJson $json) {
                                 $json->hasAll(['id', 'name'])
                                     ->whereAllType([
                                         'id' => 'integer',

@@ -63,16 +63,26 @@ class BookingController extends Controller
 
     public function all(Request $request)
     {
+        $hidden = ['room_id', 'guests'];
+
         $bookings = Booking::where('end', '>', now())
             ->orderBy('start', 'asc')
             ->with('room:id,name')
             ->get()
-            ->makeHidden(['room_id', 'updated_at', 'guests']);
+            ->makeHidden($hidden);
 
-  return response()->json($this->responseService->getFormat(
-                'Bookings successfully retrieved',
-                Booking::where('room_id', $request->room_id)->where('start', '>=', date('Y-m-d'))->with('room:id,name')->get()->makeVisible('created_at')->makeHidden(['room_id', 'guests'])
+        $filterBookings = $request->room_id;
+
+        if ($filterBookings) {
+            return response()->json($this->responseService->getFormat(
+                    'Bookings successfully retrieved',
+                    Booking::where('room_id', $request->room_id)
+                    ->where('start', '>=', date('Y-m-d'))
+                    ->with('room:id,name')
+                    ->get()
+                    ->makeHidden($hidden)
             ));
+            }
 
         return response()->json($this->responseService->getFormat(
             'Bookings successfully retrieved.',
