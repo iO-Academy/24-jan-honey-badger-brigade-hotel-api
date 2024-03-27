@@ -106,7 +106,7 @@ class BookingController extends Controller
             'report generated',
             $report
         ));
-
+    }
     public function delete(int $id)
     {
         $booking = Booking::find($id);
