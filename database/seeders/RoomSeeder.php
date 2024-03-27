@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Booking;
 use App\Models\Room;
-use App\Models\Type;
 use Illuminate\Database\Seeder;
 
 class RoomSeeder extends Seeder

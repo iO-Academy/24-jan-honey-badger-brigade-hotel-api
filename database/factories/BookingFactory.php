@@ -19,18 +19,16 @@ class BookingFactory extends Factory
     public function definition(): array
     {
         $start = $this->faker->dateTimeBetween('-1 year', '+1 year');
-        $stay = rand(1,21);
+        $stay = rand(1, 21);
         $open = Carbon::parse($start);
         $end = $open->addDays($stay);
-//        $new = date_add($start, date_interval_create_from_date_string($length));
-//        $end = date_format($new, 'Y-m-d');
 
         return [
             'room_id' => Room::factory(),
             'customer' => $this->faker->name(),
             'guests' => rand(1, 6),
             'start' => $start,
-            'end' => $end
-            ];
+            'end' => $end,
+        ];
     }
 }
