@@ -60,7 +60,6 @@ class BookingController extends Controller
         ), 201);
     }
 
-
     public function all(Request $request)
     {
         $hidden = ['room_id', 'guests'];
@@ -73,11 +72,11 @@ class BookingController extends Controller
         $filterBookings = $request->room_id;
 
         if ($filterBookings) {
-                return response()->json($this->responseService->getFormat(
-                    'Bookings successfully retrieved',
-                    $bookings->where('room_id', $request->room_id)->where('start', '>=', date('Y-m-d'))
-                ));
-            }
+            return response()->json($this->responseService->getFormat(
+                'Bookings successfully retrieved',
+                $bookings->where('room_id', $request->room_id)->where('start', '>=', date('Y-m-d'))
+            ));
+        }
 
         return response()->json($this->responseService->getFormat(
             'Bookings successfully retrieved.',

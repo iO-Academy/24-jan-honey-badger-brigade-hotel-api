@@ -25,7 +25,7 @@ class BookingValidator
             ]);
         } elseif ($request->isMethod('get')) {
             $request->validate([
-                'room_id' => 'exists:rooms,id'
+                'room_id' => 'exists:rooms,id',
             ]);
         }
 

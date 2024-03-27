@@ -211,13 +211,12 @@ class BookingTest extends TestCase
                                 $json->hasAll(['id', 'name'])
                                     ->whereAllType([
                                         'id' => 'integer',
-                                        'name' => 'string'
+                                        'name' => 'string',
                                     ]);
                             });
                     });
             });
     }
-
 
     public function test_bookings_seeAllFuture(): void
     {
@@ -253,14 +252,7 @@ class BookingTest extends TestCase
     {
         $response = $this->getJson('/api/bookings?room_id=99');
 
-        $this->assertNotNull($response, 'Response should not be null');
-
-        if (! $response)
-        {
-            $response->assertStatus(422);
-            return response()->json($this->responseService->getFormat(
-                'The selected room id is invalid'
-            ), 422);
-        }
+        $response->assertStatus(422);
+        $response->assertInvalid(['room_id']);
     }
 }

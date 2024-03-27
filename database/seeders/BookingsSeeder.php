@@ -10,7 +10,7 @@ class BookingsSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-        public function run(): void
+    public function run(): void
     {
         for ($i = 0; $i < 10; $i++) {
 
