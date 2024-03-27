@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Booking;
 use App\Models\Room;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
@@ -47,7 +48,7 @@ class BookingTest extends TestCase
         ]);
     }
 
-    public function test_bookings_dateOverlapStart()
+    public function test_bookings_dateOverlapStart(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -72,7 +73,7 @@ class BookingTest extends TestCase
 
     }
 
-    public function test_bookings_dateOverlapEnd()
+    public function test_bookings_dateOverlapEnd(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -97,7 +98,7 @@ class BookingTest extends TestCase
 
     }
 
-    public function test_bookings_dateOverlapBoth()
+    public function test_bookings_dateOverlapBoth(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -122,7 +123,7 @@ class BookingTest extends TestCase
 
     }
 
-    public function test_bookings_illogicalDates()
+    public function test_bookings_illogicalDates(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -142,7 +143,7 @@ class BookingTest extends TestCase
             });
     }
 
-    public function test_bookings_alreadyBooked()
+    public function test_bookings_alreadyBooked(): void
     {
         Room::factory()->create();
         Booking::factory()->create([
@@ -167,7 +168,7 @@ class BookingTest extends TestCase
             });
     }
 
-    public function test_bookings_tooManyGuests()
+    public function test_bookings_tooManyGuests(): void
     {
         Room::factory()->create([
             'min_capacity' => 1,
@@ -185,6 +186,36 @@ class BookingTest extends TestCase
             ->assertJson(function (AssertableJson $json) {
                 $json->hasAll(['message'])
                     ->whereType('message', 'string');
+            });
+    }
+
+    public function test_bookings_seeAllFuture(): void
+    {
+        Booking::factory()->create(['end' => Carbon::yesterday()]);
+        Booking::factory()->create(['end' => Carbon::tomorrow()]);
+        Booking::factory()->create(['end' => Carbon::now()->addDays(30)]);
+        $response = $this->getJson('/api/bookings');
+        $response->assertStatus(200)
+            ->assertJson(function (AssertableJson $json) {
+                $json->hasAll(['message', 'data'])
+                    ->whereType('message', 'string')
+                    ->has('data', 2, function (AssertableJson $json) {
+                        $json->hasAll(['id', 'customer', 'start', 'end', 'created_at', 'room'])
+                            ->whereAllType([
+                                'id' => 'integer',
+                                'customer' => 'string',
+                                'start' => 'string',
+                                'end' => 'string',
+                                'created_at' => 'string',
+                            ])
+                            ->has('room', function (AssertableJson $json) {
+                                $json->hasAll(['id', 'name'])
+                                    ->whereAllType([
+                                        'id' => 'integer',
+                                        'name' => 'string',
+                                    ]);
+                            });
+                    });
             });
     }
 }

@@ -59,4 +59,18 @@ class BookingController extends Controller
             'Booking successfully created.'
         ), 201);
     }
+
+    public function all()
+    {
+        $bookings = Booking::where('end', '>', now())
+            ->orderBy('start', 'asc')
+            ->with('room:id,name')
+            ->get()
+            ->makeHidden(['room_id', 'updated_at', 'guests']);
+
+        return response()->json($this->responseService->getFormat(
+            'Bookings successfully retrieved.',
+            $bookings
+        ));
+    }
 }
