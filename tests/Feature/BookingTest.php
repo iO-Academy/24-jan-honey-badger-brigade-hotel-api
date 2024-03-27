@@ -251,7 +251,6 @@ class BookingTest extends TestCase
     public function test_getBookingsByRoom_notFound()
     {
         $response = $this->getJson('/api/bookings?room_id=99');
-
         $response->assertStatus(422);
         $response->assertInvalid(['room_id']);
     }
